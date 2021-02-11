@@ -5,7 +5,7 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 
-PLOT_1 = False
+PLOT_1 = True
 PLOT_2 = True
 
 ###################################################################################################
@@ -39,30 +39,23 @@ def transform(X):
         X_transform = np.append(X_transform, x_pow.reshape(-1, 1), axis=1)
     return X_transform
 
-def fit(X, y, iterations=500):
+def fit(X, y, epoch=200):
     w = np.zeros(21)
-    for i in range(iterations):
+    for i in range(epoch):
+        vandermonde = transform(X)
         y_pred = predict(X, w)
         error = y_pred - y
-        w = w - (1/50) * np.dot(transform(X).T, error)
+        w = w - (1/50)*(vandermonde.T @ error)
     return w
 
-def fit_L2(X, y, L2_factor, iterations=500):
+def fit_L2(X, y, L2_factor, epoch=1):
     w = np.zeros(21)
-    for i in range(iterations):
+    for i in range(epoch):
+        vandermonde = transform(X)
         y_pred = predict(X, w)
-        error = y_pred - y 
-        
+        error = y_pred - y
         L2_term = np.sum(np.square(w))
-        ridge = L2_factor * L2_term
-
-        mse = np.sum(error ** 2) + ridge
-
-        gradient = (1/50) * ((transform(X).T @ error) + L2_factor * w)
-
-        
-        w = w - gradient
-
+        w = w - (1/50)*(vandermonde.T @ error) + L2_factor*w
     return w
 
 def predict(X, w):
@@ -89,8 +82,6 @@ MSE_valids, MSE_trains = [], []
 for i in range(1000):
     L2_factor = i/1000
     w_L2 = fit_L2(X1_train, y1_train, L2_factor)
-    print("OKKKKKKK")
-    print(L2_factor)
     y1_valid_pred_L2 = predict(X1_valid, w_L2)
     y1_train_pred_L2 = predict(X1_train, w_L2)
 
@@ -116,5 +107,6 @@ if PLOT_1:
     axis[1].set_title(f'Regression Polynomiale De Degrée 20 Sur Valid\nMSE={MSE_valid}')
     plt.show()
 
+############################################### L2 ################################################
 if PLOT_2:
     pass
