@@ -41,25 +41,25 @@ def transform(X):
 
 def fit(X, y, epoch=200):
     w = np.zeros(21)
+    vandermonde = transform(X)
     for i in range(epoch):
-        vandermonde = transform(X)
         y_pred = predict(X, w)
         error = y_pred - y
         w = w - (1/50)*(vandermonde.T @ error)
     return w
 
-def fit_L2(X, y, L2_factor, epoch=1):
+def fit_L2(X, y, L2_factor, epoch=20):
     w = np.zeros(21)
+    vandermonde = transform(X)
     for i in range(epoch):
-        vandermonde = transform(X)
         y_pred = predict(X, w)
-        error = y_pred - y
         L2_term = np.sum(np.square(w))
+        error = y_pred - y
         w = w - (1/50)*(vandermonde.T @ error) + L2_factor*w
     return w
 
 def predict(X, w):
-    return np.dot(transform(X), w)
+    return transform(X) @ w
 
 def MSE(y_pred, y_test):
     return np.square(np.subtract(y_pred, y_test)).mean()
@@ -73,7 +73,6 @@ y1_train_pred = predict(X1_train, w)
 
 MSE_valid = MSE(y1_valid_pred, y1_valid)
 MSE_train = MSE(y1_train_pred, y1_train)
-print(f'MSE for train set : {MSE_train}\nMSE for valid set : {MSE_valid}')
 
 ############################################### L2 ################################################
 y1_valid_pred_L2s, y1_train_pred_L2s = [], []
@@ -96,6 +95,7 @@ for i in range(1000):
 ###################################################################################################
 if PLOT_1:
     figure, axis = plt.subplots(2, 1) 
+
     axis[0].scatter(X1_train, y1_train, label='y_train')
     axis[0].scatter(X1_train, y1_train_pred, label='y_pred')
     axis[0].legend()
@@ -109,4 +109,12 @@ if PLOT_1:
 
 ############################################### L2 ################################################
 if PLOT_2:
-    pass
+    L2_factor = [i/1000 for i in range(1000)]
+
+    plt.scatter(L2_factor, MSE_valids, label='valid_set')
+    plt.scatter(L2_factor, MSE_trains, label='train_set')
+    plt.legend()
+    plt.title(f'MSE en fonction de l\'hyperparametre $lambda$')
+    plt.xlabel('$lambda$')
+    plt.ylabel('MSE')
+    plt.show()
