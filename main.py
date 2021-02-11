@@ -33,11 +33,11 @@ with open('Datasets/Dataset_1_valid.csv') as csvfile:
 ############################################ FUNCTIONS ############################################
 ###################################################################################################
 def transform(X):
-    X_transform = np.ones((50, 1))
+    vandermonde = np.ones((50, 1))
     for j in range(1, 21):
         x_pow = np.power(X, j)
-        X_transform = np.append(X_transform, x_pow.reshape(-1, 1), axis=1)
-    return X_transform
+        vandermonde = np.append(vandermonde, x_pow.reshape(-1, 1), axis=1)
+    return vandermonde
 
 def fit(X, y, epoch=200):
     w = np.zeros(21)
