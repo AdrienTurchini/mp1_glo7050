@@ -1,7 +1,16 @@
+###################################################################################################
+############################################# MODULES #############################################
+###################################################################################################
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
 
+PLOT_1 = False
+PLOT_2 = True
+
+###################################################################################################
+########################################### DATAS IMPORT ##########################################
+###################################################################################################
 with open('Datasets/Dataset_1_test.csv') as csvfile:
     data = np.array(list(csv.reader(csvfile)))
     data = data[:, :2].astype(np.float)
@@ -20,18 +29,82 @@ with open('Datasets/Dataset_1_valid.csv') as csvfile:
     X1_valid = data[:, 0]
     y1_valid = data[:, 1]
 
-def poly_20(x, weight_list):
-    acc = weight_list[0]
-    for n in range(1, 21):
-        acc += (x**n)*weight_list[n]
-    return acc
+###################################################################################################
+############################################ FUNCTIONS ############################################
+###################################################################################################
+def transform(X):
+    X_transform = np.ones((50, 1))
+    for j in range(1, 21):
+        x_pow = np.power(X, j)
+        X_transform = np.append(X_transform, x_pow.reshape(-1, 1), axis=1)
+    return X_transform
+
+def fit(X, y, iterations=500):
+    w = np.zeros(21)
+    for i in range(iterations):
+        y_pred = predict(X, w)
+        error = y_pred - y
+        w = w - (1/50) * np.dot(transform(X).T, error)
+    return w
+
+def fit_L2(X, y, L2_factor, iterations=500):
+    w = np.zeros(21)
+    for i in range(iterations):
+        y_pred = predict(X, w)
+        error = y_pred - y
+        L2_term = np.sum(np.square(w))
+        w = w - (1/50)*np.dot(transform(X).T, error) + L2_factor*L2_term
+    return w
+
+def predict(X, w):
+    return np.dot(transform(X), w)
 
 def MSE(y_pred, y_test):
     return np.square(np.subtract(y_pred, y_test)).mean()
 
-def plot(data):
-    plt.figure()
-    plt.scatter(x=data[:,0],y=data[:,1])           
+###################################################################################################
+############################################## CODE ###############################################
+###################################################################################################
+w = fit(X1_train, y1_train)
+y1_valid_pred = predict(X1_valid, w)
+y1_train_pred = predict(X1_train, w)
+
+MSE_valid = MSE(y1_valid_pred, y1_valid)
+MSE_train = MSE(y1_train_pred, y1_train)
+print(f'MSE for train set : {MSE_train}\nMSE for valid set : {MSE_valid}')
+
+############################################### L2 ################################################
+y1_valid_pred_L2s, y1_train_pred_L2s = [], []
+MSE_valids, MSE_trains = [], []
+
+for i in range(1000):
+    L2_factor = i/1000
+    w_L2 = fit_L2(X1_train, y1_train, L2_factor)
+    print(L2_factor)
+    y1_valid_pred_L2 = predict(X1_valid, w_L2)
+    y1_train_pred_L2 = predict(X1_train, w_L2)
+
+    y1_valid_pred_L2s.append(y1_valid_pred_L2)
+    y1_train_pred_L2s.append(y1_train_pred_L2)
+
+    MSE_valids.append(MSE(y1_valid_pred_L2, y1_valid))
+    MSE_trains.append(MSE(y1_train_pred_L2, y1_train))
+
+###################################################################################################
+############################################# GRAPHS ##############################################
+###################################################################################################
+if PLOT_1:
+    figure, axis = plt.subplots(2, 1) 
+    axis[0].scatter(X1_train, y1_train, label='y_train')
+    axis[0].scatter(X1_train, y1_train_pred, label='y_pred')
+    axis[0].legend()
+    axis[0].set_title(f'Regression Polynomiale De Degrée 20 Sur Train\nMSE={MSE_train}')
+
+    axis[1].scatter(X1_valid, y1_valid, label='y_valid')
+    axis[1].scatter(X1_valid, y1_valid_pred, label='y_pred')
+    axis[1].legend()
+    axis[1].set_title(f'Regression Polynomiale De Degrée 20 Sur Valid\nMSE={MSE_valid}')
     plt.show()
 
-plot(data)
+if PLOT_2:
+    pass
