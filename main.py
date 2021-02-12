@@ -39,30 +39,28 @@ def transform(X):
         vandermonde = np.append(vandermonde, x_pow.reshape(-1, 1), axis=1)
     return vandermonde
 
-def fit(X, y, epoch=200):
+def fit(X, y, epoch=100):
     w = np.zeros(21)
     vandermonde = transform(X)
     for i in range(epoch):
         y_pred = predict(X, w)
-        error = y_pred - y
-        w = w - (1/50)*(vandermonde.T @ error)
+        w = w - (1/50)*(vandermonde.T @ (y_pred - y))
     return w
 
-def fit_L2(X, y, L2_factor, epoch=20):
+def fit_L2(X, y, L2, epoch=2):
     w = np.zeros(21)
     vandermonde = transform(X)
     for i in range(epoch):
         y_pred = predict(X, w)
-        L2_term = np.sum(np.square(w))
-        error = y_pred - y
-        w = w - (1/50)*(vandermonde.T @ error) + L2_factor*w
+        w[0] = w[0] - (1/50)*np.sum(y_pred - y)
+        w[1:] = w[1:] - (1/50)*(vandermonde[:,1:].T @ (y_pred - y)) + L2*w[1:]
     return w
 
 def predict(X, w):
     return transform(X) @ w
 
 def MSE(y_pred, y_test):
-    return np.square(np.subtract(y_pred, y_test)).mean()
+    return np.square(y_pred - y_test).mean()
 
 ###################################################################################################
 ############################################## CODE ###############################################
@@ -77,9 +75,10 @@ MSE_train = MSE(y1_train_pred, y1_train)
 ############################################### L2 ################################################
 y1_valid_pred_L2s, y1_train_pred_L2s = [], []
 MSE_valids, MSE_trains = [], []
+N = 100
 
-for i in range(1000):
-    L2_factor = i/1000
+for i in range(N):
+    L2_factor = i/N
     w_L2 = fit_L2(X1_train, y1_train, L2_factor)
     y1_valid_pred_L2 = predict(X1_valid, w_L2)
     y1_train_pred_L2 = predict(X1_train, w_L2)
@@ -109,7 +108,7 @@ if PLOT_1:
 
 ############################################### L2 ################################################
 if PLOT_2:
-    L2_factor = [i/1000 for i in range(1000)]
+    L2_factor = [i/N for i in range(N)]
 
     plt.scatter(L2_factor, MSE_valids, label='valid_set')
     plt.scatter(L2_factor, MSE_trains, label='train_set')
