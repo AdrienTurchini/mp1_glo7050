@@ -52,8 +52,7 @@ def fit_L2(X, y, L2, epoch=2):
     vandermonde = transform(X)
     for i in range(epoch):
         y_pred = predict(X, w)
-        w[0] = w[0] - (1/50)*np.sum(y_pred - y)
-        w[1:] = w[1:] - (1/50)*(vandermonde[:,1:].T @ (y_pred - y)) + L2*w[1:]
+        w = w - (1/50)*(vandermonde.T @ (y_pred - y)) + L2*w
     return w
 
 def predict(X, w):
