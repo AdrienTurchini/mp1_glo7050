@@ -58,8 +58,8 @@ def fit_L2(X, y, L2, epoch=2):
 def predict(X, w):
     return transform(X) @ w
 
-def MSE(y_pred, y_test):
-    return np.square(y_pred - y_test).mean()
+def MSE(y_pred, y):
+    return np.square(y_pred - y).mean()
 
 ###################################################################################################
 ############################################## CODE ###############################################
@@ -71,10 +71,13 @@ y1_train_pred = predict(X1_train, w)
 MSE_valid = MSE(y1_valid_pred, y1_valid)
 MSE_train = MSE(y1_train_pred, y1_train)
 
+
+
 ############################################### L2 ################################################
 y1_valid_pred_L2s, y1_train_pred_L2s = [], []
 MSE_valids, MSE_trains = [], []
 N = 100
+L2_factors = [i/N for i in range(N)]
 
 for i in range(N):
     L2_factor = i/N
@@ -87,6 +90,11 @@ for i in range(N):
 
     MSE_valids.append(MSE(y1_valid_pred_L2, y1_valid))
     MSE_trains.append(MSE(y1_train_pred_L2, y1_train))
+
+L2 = L2_factors[MSE_valids.index(min(MSE_valids))]
+w_L2 = fit_L2(X1_test, y1_test, L2)
+y1_test_pred_L2 = predict(X1_test, w_L2)
+MSE_test = MSE(y1_test_pred_L2, y1_test)
 
 ###################################################################################################
 ############################################# GRAPHS ##############################################
@@ -107,12 +115,16 @@ if PLOT_1:
 
 ############################################### L2 ################################################
 if PLOT_2:
-    L2_factor = [i/N for i in range(N)]
-
-    plt.scatter(L2_factor, MSE_valids, label='valid_set')
-    plt.scatter(L2_factor, MSE_trains, label='train_set')
+    plt.scatter(L2_factors, MSE_valids, label='valid_set')
+    plt.scatter(L2_factors, MSE_trains, label='train_set')
     plt.legend()
     plt.title(f'MSE en fonction de l\'hyperparametre $lambda$')
     plt.xlabel('$lambda$')
     plt.ylabel('MSE')
+    plt.show()
+
+    plt.scatter(X1_test, y1_test, label='y_test')
+    plt.scatter(X1_test, y1_test_pred_L2 , label='y_pred')
+    plt.legend()
+    plt.title(f'Regression Polynomiale De Degrée 20 Sur Test\nMSE={MSE_test}')
     plt.show()
