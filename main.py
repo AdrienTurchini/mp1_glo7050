@@ -2,6 +2,7 @@
 ############################################# MODULES #############################################
 ###################################################################################################
 import numpy as np
+import pandas as pd
 import csv
 import matplotlib.pyplot as plt
 
@@ -51,6 +52,13 @@ with open('Datasets/Dataset_2_valid.csv') as csvfile:
     X2_valid = data[:, 0]
     X2_valid / np.linalg.norm(X1_valid)
     y2_valid = data[:, 1]
+
+names = pd.read_csv('Datasets/attributes.csv', delim_whitespace=True)
+data = pd.read_csv('Datasets/communities.data', names=names['names']).replace('?', np.nan)
+#feat_miss = data.columns[data.isnull().any()]
+
+print(data.shape)
+print(data.head())
 
 #########################################################################################################
 ############################################ FUNCTIONS EXO 1 ############################################
@@ -193,7 +201,10 @@ def exo1():
     plt.show()
     
 def exo2():
-    model = LinearReg(epochs=100, learning_rate=1e-1)
+    print("-----------------")
+    print("QUESTION 1")
+    print("-----------------")
+    model = LinearReg(epochs=50, learning_rate=1e-6)
     model.fit(X2_train, y2_train)
     y2_train_pred = model.predict(X2_train)
     y2_train_MSE = MSE(y2_train_pred, y2_train)
@@ -201,13 +212,35 @@ def exo2():
     y2_valid_pred = model.predict(X2_valid)
     y2_valid_MSE = MSE(y2_valid_pred, y2_valid)
 
-    print(y2_train_MSE)
-    print(y2_valid_MSE)
+    print(f'MSE pour le jeu de validation avec un pas de 1e-6 et 50 epochs = {y2_valid_MSE}')
 
-    plt.scatter(X2_valid, y2_valid, label='y')
-    plt.scatter(X2_valid, y2_valid_pred, label='y_pred')
-    plt.legend()
+    # question 2
+    print("-----------------")
+    print("QUESTION 2")
+    print("-----------------")
+    pas = [i/100 for i in range(20, 200, 10)]
+    _MSE = []
+    for i in pas :
+        model = LinearReg(learning_rate = i)
+        model.fit(X2_train, y2_train)
+
+        y2_valid_pred = model.predict(X2_valid)
+        y2_valid_MSE = MSE(y2_valid_pred, y2_valid)
+
+        _MSE.append(y2_valid_MSE)
+    
+    for i in range(len(pas)):
+        print(f"Jeu de validation avec 50 epochs: Pas utilise = {pas[i]}, MSE = {_MSE[i]}")
+
+    plt.plot(pas, _MSE)
+    plt.xlabel("pas")
+    plt.ylabel("MSE")
+    plt.title("MSE selon le pas utilisé et avec 50 epochs")
     plt.show()
+
+    print("La MSE est la plus faible pouru")
+    
+
 
 
 exo2()
