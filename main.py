@@ -107,22 +107,24 @@ class LinearReg:
         for epoch in range(self.epochs):
             y_pred = self.predict(X)
 
-            grad_a = X*(y - y_pred)/self.N
-            grad_b = (y - y_pred)/self.N
+            error = y_pred - y 
+
+            grad_a = X*error/self.N
+            grad_b = error/self.N
 
             self.a = self.a - self.lr * grad_a
             self.b = self.b - self.lr * grad_b
             
             MSE = self.MSE(y_pred, y)
             MSE_tmp.append(MSE)
-            print(f'    Epoch: {epoch+1}/{self.epochs}, MSE={MSE}')
+            #print(f'    Epoch: {epoch+1}/{self.epochs}, MSE={MSE}')
         
         self.MSE_global.append(MSE_tmp)
     
     def fit(self, X, y):
         self.N = len(X)
         for Xi, yi, i in zip(X, y, range(self.N)):
-            print(f'Val: {i}/{self.N} -----------------------------')
+            #print(f'Val: {i}/{self.N} -----------------------------')
             self.SGD(Xi, yi)
 
 
@@ -191,7 +193,7 @@ def exo1():
     plt.show()
     
 def exo2():
-    model = LinearReg()
+    model = LinearReg(epochs=100, learning_rate=1e-1)
     model.fit(X2_train, y2_train)
     y2_train_pred = model.predict(X2_train)
     y2_train_MSE = MSE(y2_train_pred, y2_train)
@@ -201,5 +203,11 @@ def exo2():
 
     print(y2_train_MSE)
     print(y2_valid_MSE)
+
+    plt.scatter(X2_valid, y2_valid, label='y')
+    plt.scatter(X2_valid, y2_valid_pred, label='y_pred')
+    plt.legend()
+    plt.show()
+
 
 exo2()
