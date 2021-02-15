@@ -205,7 +205,7 @@ class LinearReg:
                 axis_exo2_2[2][0].scatter(self.X_valid, y_valid_pred, label = "y_pred")
                 axis_exo2_2[2][0].legend()
                 axis_exo2_2[2][0].set_title(f"y_pred après entrainement sur {i+1} données")
-        plt.show(False)
+        plt.show()
 
 ###################################################################################################
 ############################################## CODE ###############################################
@@ -304,7 +304,7 @@ def exo2():
     axis_exo2_1.set_xlabel("pas")
     axis_exo2_1.set_ylabel("MSE")
     axis_exo2_1.set_title("MSE selon le pas utilisé et avec 50 epochs")
-    plt.show(False)
+    plt.show()
     
     print("\nLe pas qui nous donne la MSE la plus faible est 0.95, nous le garderons donc par la suite.")
     print("-----")
@@ -334,7 +334,7 @@ def exo3():
 
 
 if __name__ == '__main__':
-    #exo1()
-    #exo2()
+    exo1()
+    exo2()
     exo3()
     
