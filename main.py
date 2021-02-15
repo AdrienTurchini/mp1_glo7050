@@ -115,7 +115,7 @@ class LinearReg:
             
             MSE = self.MSE(y_pred, y)
             MSE_tmp.append(MSE)
-            print(f'    Epoch: {epoch}/{self.epochs}, MSE={MSE}')
+            print(f'    Epoch: {epoch+1}/{self.epochs}, MSE={MSE}')
         
         self.MSE_global.append(MSE_tmp)
     
@@ -193,5 +193,13 @@ def exo1():
 def exo2():
     model = LinearReg()
     model.fit(X2_train, y2_train)
+    y2_train_pred = model.predict(X2_train)
+    y2_train_MSE = MSE(y2_train_pred, y2_train)
+
+    y2_valid_pred = model.predict(X2_valid)
+    y2_valid_MSE = MSE(y2_valid_pred, y2_valid)
+
+    print(y2_train_MSE)
+    print(y2_valid_MSE)
 
 exo2()
