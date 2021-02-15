@@ -5,7 +5,7 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 
-PLOT_1 = True
+PLOT_1 = False
 PLOT_2 = True
 
 ###################################################################################################
@@ -21,12 +21,20 @@ with open('Datasets/Dataset_1_train.csv') as csvfile:
     data = np.array(list(csv.reader(csvfile)))
     data = data[:, :2].astype(np.float)
     X1_train = data[:, 0]
+    X1_train / np.linalg.norm(X1_train)
+    #X1_train = X1_train - X1_train.mean()
+    #X1_train = X1_train / np.abs(X1_train).max()
+
     y1_train = data[:, 1]
 
 with open('Datasets/Dataset_1_valid.csv') as csvfile:
     data = np.array(list(csv.reader(csvfile)))
     data = data[:, :2].astype(np.float)
     X1_valid = data[:, 0]
+    X1_valid / np.linalg.norm(X1_valid)
+
+    #X1_valid = X1_valid - X1_valid.mean()
+    #X1_valid = X1_valid / np.abs(X1_valid).max()
     y1_valid = data[:, 1]
 
 ###################################################################################################
@@ -47,12 +55,12 @@ def fit(X, y, epoch=100):
         w = w - (1/50)*(vandermonde.T @ (y_pred - y))
     return w
 
-def fit_L2(X, y, L2, epoch=2):
+def fit_L2(X, y, L2, epoch=50):
     w = np.zeros(21)
     vandermonde = transform(X)
     for i in range(epoch):
         y_pred = predict(X, w)
-        w = w - (1/50)*(vandermonde.T @ (y_pred - y)) + L2*w
+        w = w - (0.5*(vandermonde.T @ (y_pred - y)) + (L2 * w))/50
     return w
 
 def predict(X, w):
@@ -70,7 +78,6 @@ y1_train_pred = predict(X1_train, w)
 
 MSE_valid = MSE(y1_valid_pred, y1_valid)
 MSE_train = MSE(y1_train_pred, y1_train)
-
 
 
 ############################################### L2 ################################################
@@ -91,10 +98,10 @@ for i in range(N):
     MSE_valids.append(MSE(y1_valid_pred_L2, y1_valid))
     MSE_trains.append(MSE(y1_train_pred_L2, y1_train))
 
-L2 = L2_factors[MSE_valids.index(min(MSE_valids))]
+'''L2 = L2_factors[MSE_valids.index(min(MSE_valids))]
 w_L2 = fit_L2(X1_test, y1_test, L2)
 y1_test_pred_L2 = predict(X1_test, w_L2)
-MSE_test = MSE(y1_test_pred_L2, y1_test)
+MSE_test = MSE(y1_test_pred_L2, y1_test)'''
 
 ###################################################################################################
 ############################################# GRAPHS ##############################################
@@ -123,8 +130,8 @@ if PLOT_2:
     plt.ylabel('MSE')
     plt.show()
 
-    plt.scatter(X1_test, y1_test, label='y_test')
+''' plt.scatter(X1_test, y1_test, label='y_test')
     plt.scatter(X1_test, y1_test_pred_L2 , label='y_pred')
     plt.legend()
     plt.title(f'Regression Polynomiale De Degrée 20 Sur Test\nMSE={MSE_test}')
-    plt.show()
+    plt.show()'''
