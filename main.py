@@ -4,7 +4,6 @@
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 
 PLOT_1 = False
 PLOT_2 = False
@@ -103,23 +102,29 @@ class LinearReg:
     def MSE(self, y_pred, y):
         return np.square(y_pred - y).mean()
 
-    def fit(self, X, y):
+    def SGD(self, X, y):
         MSE_tmp = list()
-        N = len(X)
-        for epoch in tqdm(range(self.epochs)):
+        for epoch in range(self.epochs):
             y_pred = self.predict(X)
 
-            grad_a = sum(X*(y - y_pred))/N
-            grad_b = sum(y - y_pred)/N
+            grad_a = X*(y - y_pred)/self.N
+            grad_b = (y - y_pred)/self.N
 
             self.a = self.a - self.lr * grad_a
             self.b = self.b - self.lr * grad_b
             
             MSE = self.MSE(y_pred, y)
             MSE_tmp.append(MSE)
-            print(f'MSE={MSE}')
+            print(f'    Epoch: {epoch}/{self.epochs}, MSE={MSE}')
         
         self.MSE_global.append(MSE_tmp)
+    
+    def fit(self, X, y):
+        self.N = len(X)
+        for Xi, yi, i in zip(X, y, range(self.N)):
+            print(f'Val: {i}/{self.N} -----------------------------')
+            self.SGD(Xi, yi)
+
 
 #########################################################################################################
 ############################################ FUNCTIONS EXO 3 ############################################
@@ -187,4 +192,6 @@ def exo1():
     
 def exo2():
     model = LinearReg()
-    
+    model.fit(X2_train, y2_train)
+
+exo2()
