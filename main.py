@@ -130,21 +130,71 @@ class LinearReg:
             #print(f'    Epoch: {epoch+1}/{self.epochs}, MSE={MSE}')
         
         self.MSE_global.append(MSE_tmp)
+
+    def SGD_plt(self, X, y):
+        MSE_tmp = list()
+        for epoch in range(self.epochs):
+            y_pred = self.predict(X)
+
+            error = y_pred - y 
+
+            grad_a = X*error/self.N
+            grad_b = error/self.N
+
+            self.a = self.a - self.lr * grad_a
+            self.b = self.b - self.lr * grad_b
+            
+            MSE = self.MSE(y_pred, y)
+            MSE_tmp.append(MSE)
+
+        self.MSE_global.append(MSE_tmp)
     
     def fit(self, X, y):
         self.N = len(X)
         for Xi, yi, i in zip(X, y, range(self.N)):
-            #print(f'Val: {i}/{self.N} -----------------------------')
             self.SGD(Xi, yi)
 
     def fit_and_MSE_valid(self, X, y):
         self.N = len(X)
         for Xi, yi, i in zip(X, y, range(self.N)):
-            #print(f'Val: {i}/{self.N} -----------------------------')
             self.SGD(Xi, yi)
             y_pred_valid = self.predict(self.X_valid)
             mse_valid = self.MSE(y_pred_valid, self.y_valid)
             print(f"MSE pour le jeu de validation après {i+1} données d'entrainement, 50 epochs par donnée et un pas de {self.lr} = {mse_valid}")
+
+    def fit_and_plot_valid(self, X, y):
+        self.N = len(X)
+        figure_exo2_2, axis_exo2_2 = plt.subplots(3, 2)
+        axis_exo2_2[0][0].scatter(self.X_valid, self.y_valid, label = "y_valid")
+        axis_exo2_2[0][1].scatter(self.X_valid, self.y_valid, label = "y_valid")
+        axis_exo2_2[1][0].scatter(self.X_valid, self.y_valid, label = "y_valid")
+        axis_exo2_2[1][1].scatter(self.X_valid, self.y_valid, label = "y_valid")
+        axis_exo2_2[2][0].scatter(self.X_valid, self.y_valid, label = "y_valid")
+        for Xi, yi, i in zip(X, y, range(self.N)):
+            self.SGD_plt(Xi, yi)
+            y_valid_pred = self.predict(self.X_valid)
+            
+            if i == 0:
+                axis_exo2_2[0][0].scatter(self.X_valid, y_valid_pred, label = "y_pred")
+                axis_exo2_2[0][0].legend()
+                axis_exo2_2[0][0].set_title(f"y_pred après entrainement sur {i+1} données")
+            elif i == 75:
+                axis_exo2_2[0][1].scatter(self.X_valid, y_valid_pred, label = "y_pred")
+                axis_exo2_2[0][1].legend()
+                axis_exo2_2[0][1].set_title(f"y_pred après entrainement sur {i+1} données")
+            elif i == 150:
+                axis_exo2_2[1][0].scatter(self.X_valid, y_valid_pred, label = "y_pred")
+                axis_exo2_2[1][0].legend()
+                axis_exo2_2[1][0].set_title(f"y_pred après entrainement sur {i+1} données")
+            elif i == 225:
+                axis_exo2_2[1][1].scatter(self.X_valid, y_valid_pred, label = "y_pred")
+                axis_exo2_2[1][1].legend()
+                axis_exo2_2[1][1].set_title(f"y_pred après entrainement sur {i+1} données")
+            elif i == 299:
+                axis_exo2_2[2][0].scatter(self.X_valid, y_valid_pred, label = "y_pred")
+                axis_exo2_2[2][0].legend()
+                axis_exo2_2[2][0].set_title(f"y_pred après entrainement sur {i+1} données")
+        plt.show(False)
 
 
 #########################################################################################################
@@ -243,10 +293,11 @@ def exo2():
     for i in range(len(pas)):
         print(f"Jeu de validation, Epochs = 50, Pas = {pas[i]} --> MSE = {_MSE[i]}")
 
-    plt.plot(pas, _MSE)
-    plt.xlabel("pas")
-    plt.ylabel("MSE")
-    plt.title("MSE selon le pas utilisé et avec 50 epochs")
+    figure_exo2_1, axis_exo2_1 = plt.subplots(1, 1) 
+    axis_exo2_1.plot(pas, _MSE)
+    axis_exo2_1.set_xlabel("pas")
+    axis_exo2_1.set_ylabel("MSE")
+    axis_exo2_1.set_title("MSE selon le pas utilisé et avec 50 epochs")
     plt.show(False)
     
     print("\nLe pas qui nous donne la MSE la plus faible est 0.95, nous le garderons donc par la suite.")
@@ -263,6 +314,7 @@ def exo2():
     print("-----------------")
     print("QUESTION 3")
     print("-----------------")
+    modelFinal.fit_and_plot_valid(X2_train, y2_train)
 
     plt.show()
 
