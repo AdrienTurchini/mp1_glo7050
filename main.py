@@ -4,6 +4,7 @@
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 PLOT_1 = False
 PLOT_2 = False
@@ -22,9 +23,6 @@ with open('Datasets/Dataset_1_train.csv') as csvfile:
     data = data[:, :2].astype(np.float)
     X1_train = data[:, 0]
     X1_train / np.linalg.norm(X1_train)
-    #X1_train = X1_train - X1_train.mean()
-    #X1_train = X1_train / np.abs(X1_train).max()
-
     y1_train = data[:, 1]
 
 with open('Datasets/Dataset_1_valid.csv') as csvfile:
@@ -32,10 +30,28 @@ with open('Datasets/Dataset_1_valid.csv') as csvfile:
     data = data[:, :2].astype(np.float)
     X1_valid = data[:, 0]
     X1_valid / np.linalg.norm(X1_valid)
-
-    #X1_valid = X1_valid - X1_valid.mean()
-    #X1_valid = X1_valid / np.abs(X1_valid).max()
     y1_valid = data[:, 1]
+
+with open('Datasets/Dataset_2_test.csv') as csvfile:
+    data = np.array(list(csv.reader(csvfile)))
+    data = data[:, :2].astype(np.float)
+    X2_test = data[:, 0]
+    X2_test / np.linalg.norm(X2_test)
+    y2_test = data[:, 1]
+
+with open('Datasets/Dataset_2_train.csv') as csvfile:
+    data = np.array(list(csv.reader(csvfile)))
+    data = data[:, :2].astype(np.float)
+    X2_train = data[:, 0]
+    X2_train / np.linalg.norm(X1_train)
+    y2_train = data[:, 1]
+
+with open('Datasets/Dataset_2_valid.csv') as csvfile:
+    data = np.array(list(csv.reader(csvfile)))
+    data = data[:, :2].astype(np.float)
+    X2_valid = data[:, 0]
+    X2_valid / np.linalg.norm(X1_valid)
+    y2_valid = data[:, 1]
 
 #########################################################################################################
 ############################################ FUNCTIONS EXO 1 ############################################
@@ -90,7 +106,7 @@ class LinearReg:
     def fit(self, X, y):
         MSE_tmp = list()
         N = len(X)
-        for epoch in range(self.epochs):
+        for epoch in tqdm(range(self.epochs)):
             y_pred = self.predict(X)
 
             grad_a = sum(X*(y - y_pred))/N
@@ -99,7 +115,9 @@ class LinearReg:
             self.a = self.a - self.lr * grad_a
             self.b = self.b - self.lr * grad_b
             
-            MSE_tmp.append(self.MSE(y_pred, y))
+            MSE = self.MSE(y_pred, y)
+            MSE_tmp.append(MSE)
+            print(f'MSE={MSE}')
         
         self.MSE_global.append(MSE_tmp)
 
@@ -166,4 +184,7 @@ def exo1():
     plt.xlabel('$lambda$')
     plt.ylabel('MSE')
     plt.show()
+    
+def exo2():
+    model = LinearReg()
     
