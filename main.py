@@ -72,7 +72,36 @@ def MSE(y_pred, y):
 #########################################################################################################
 ############################################ FUNCTIONS EXO 2 ############################################
 #########################################################################################################
+class LinearReg:
+    def __init__(self, epoch=20, learning_rate=1e-6):
+        #y = a*x + b
+        self.a = 0
+        self.b = 0
+        self.epoch = epoch
+        self.lr = learning_rate
+        self.N = len(X)
+        self.MSE_global = list()
 
+    def predict(self, X):
+        return self.a*X + self.b
+
+    def MSE(y_pred, y):
+        return np.square(y_pred - y).mean()
+
+    def fit(self, X, y):
+        MSE_tmp = list()
+        for epoch in range(epochs):
+            y_pred = self.predict(X)
+
+            grad_a = sum(X*(y - y_pred))/self.N
+            grad_b = sum(y - y_pred)/self.N
+
+            self.a = self.a - self.lr * grad_a
+            self.b = self.b - self.lr * grad_b
+            
+            MSE_tmp.append(self.MSE(y_pred, y))
+        
+        self.MSE_global.append(MSE_tmp)
 
 #########################################################################################################
 ############################################ FUNCTIONS EXO 3 ############################################
@@ -137,6 +166,4 @@ def exo1():
     plt.xlabel('$lambda$')
     plt.ylabel('MSE')
     plt.show()
-
-if __name__ == '__main__':
-    #exo1()
+    
