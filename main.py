@@ -96,13 +96,15 @@ def MSE(y_pred, y):
 ############################################ FUNCTIONS EXO 2 ############################################
 #########################################################################################################
 class LinearReg:
-    def __init__(self, epochs=20, learning_rate=1e-6):
+    def __init__(self, epochs=20, learning_rate=1e-6, X_valid = [], y_valid = []):
         #y = a*x + b
         self.a = 0
         self.b = 0
         self.epochs = epochs
         self.lr = learning_rate
         self.MSE_global = list()
+        self.X_valid = X_valid
+        self.y_valid = y_valid
 
     def predict(self, X):
         return self.a*X + self.b
@@ -134,6 +136,15 @@ class LinearReg:
         for Xi, yi, i in zip(X, y, range(self.N)):
             #print(f'Val: {i}/{self.N} -----------------------------')
             self.SGD(Xi, yi)
+
+    def fit_and_MSE_valid(self, X, y):
+        self.N = len(X)
+        for Xi, yi, i in zip(X, y, range(self.N)):
+            #print(f'Val: {i}/{self.N} -----------------------------')
+            self.SGD(Xi, yi)
+            y_pred_valid = self.predict(self.X_valid)
+            mse_valid = self.MSE(y_pred_valid, self.y_valid)
+            print(f"MSE pour le jeu de validation après {i+1} données d'entrainement, 50 epochs par donnée et un pas de {self.lr} = {mse_valid}")
 
 
 #########################################################################################################
@@ -204,24 +215,24 @@ def exo2():
     print("-----------------")
     print("QUESTION 1")
     print("-----------------")
-    model = LinearReg(epochs=50, learning_rate=1e-6)
-    model.fit(X2_train, y2_train)
+    model = LinearReg(epochs=50, learning_rate=1e-6, X_valid = X2_valid, y_valid = y2_valid)
+    model.fit_and_MSE_valid(X2_train, y2_train)
     y2_train_pred = model.predict(X2_train)
     y2_train_MSE = MSE(y2_train_pred, y2_train)
 
     y2_valid_pred = model.predict(X2_valid)
     y2_valid_MSE = MSE(y2_valid_pred, y2_valid)
 
-    print(f'MSE pour le jeu de validation avec un pas de 1e-6 et 50 epochs = {y2_valid_MSE}')
-
+    print("\nOn remarque que le MSE diminue plus le nombre de données d'entrainement est grand, cependant le pas semble trop petit pour voir une nette diminution de la MSE")
+    
     # question 2
     print("-----------------")
     print("QUESTION 2")
     print("-----------------")
-    pas = [i/100 for i in range(20, 200, 10)]
+    pas = [i/100 for i in range(20, 200, 5)]
     _MSE = []
     for i in pas :
-        model = LinearReg(learning_rate = i)
+        model = LinearReg(learning_rate = i, X_valid = X2_valid, y_valid = y2_valid)
         model.fit(X2_train, y2_train)
 
         y2_valid_pred = model.predict(X2_valid)
@@ -230,17 +241,32 @@ def exo2():
         _MSE.append(y2_valid_MSE)
     
     for i in range(len(pas)):
-        print(f"Jeu de validation avec 50 epochs: Pas utilise = {pas[i]}, MSE = {_MSE[i]}")
+        print(f"Jeu de validation, Epochs = 50, Pas = {pas[i]} --> MSE = {_MSE[i]}")
 
     plt.plot(pas, _MSE)
     plt.xlabel("pas")
     plt.ylabel("MSE")
     plt.title("MSE selon le pas utilisé et avec 50 epochs")
-    plt.show()
+    plt.show(False)
+    
+    print("\nLe pas qui nous donne la MSE la plus faible est 0.95, nous le garderons donc par la suite.")
+    print("-----")
+    modelFinal = LinearReg(epochs = 1, learning_rate= 0.95, X_valid= X2_valid, y_valid= y2_valid)
+    modelFinal.fit(X2_train, y2_train)
 
-    print("La MSE est la plus faible pouru")
+    y2_valid_pred = modelFinal.predict(X2_valid)
+    y2_valid_MSE = MSE(y2_valid_pred, y2_valid)
+    print(f"La MSE du jeu de test pour le modèle final avec 50 epochs et un pas de 0.9 est de : {y2_valid_MSE}")
     
 
+    # question 3
+    print("-----------------")
+    print("QUESTION 3")
+    print("-----------------")
+
+    plt.show()
+
+    
 
 
 exo2()
