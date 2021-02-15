@@ -318,7 +318,8 @@ def exo2():
 
     plt.show()
 
+
+'''if __name__ == '__main__':
+    #exo1()
+    #exo2()'''
     
-
-
-exo2()
