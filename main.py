@@ -54,8 +54,19 @@ with open('Datasets/Dataset_2_valid.csv') as csvfile:
     y2_valid = data[:, 1]
 
 names = pd.read_csv('Datasets/attributes.csv', delim_whitespace=True)
-data = pd.read_csv('Datasets/communities.data', names=names['names']).replace('?', np.nan)
-#feat_miss = data.columns[data.isnull().any()]
+data = pd.read_csv('Datasets/communities.data', names=names['names']).replace('?', np.NaN)
+
+print(data.head())
+data = data.loc[:, data.columns != 'communityname']
+data = data.astype('float')
+print(data.head())
+missing_features = data.columns[data.isnull().any()]
+print(missing_features)
+print(data[missing_features].mean())
+for col in missing_features:
+    data[col].fillna(value=data[col].mean(), inplace=True)
+print(data[missing_features].mean())
+print(data.head())
 
 print(data.shape)
 print(data.head())
@@ -196,11 +207,6 @@ class LinearReg:
                 axis_exo2_2[2][0].set_title(f"y_pred après entrainement sur {i+1} données")
         plt.show(False)
 
-
-#########################################################################################################
-############################################ FUNCTIONS EXO 3 ############################################
-#########################################################################################################
-
 ###################################################################################################
 ############################################## CODE ###############################################
 ###################################################################################################
@@ -319,7 +325,16 @@ def exo2():
     plt.show()
 
 
-'''if __name__ == '__main__':
+#########################################################################################################
+############################################ EXO 3 ######################################################
+#########################################################################################################
+
+def exo3():
+    print("hey")
+
+
+if __name__ == '__main__':
     #exo1()
-    #exo2()'''
+    #exo2()
+    exo3()
     
