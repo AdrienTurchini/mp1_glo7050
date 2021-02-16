@@ -456,14 +456,7 @@ def exo3():
     
 
 
-    model = LinearReg(epochs=50, learning_rate=1e-6,
-                      X_valid=X2_valid, y_valid=y2_valid)
-    model.fit_and_MSE_valid(X2_train, y2_train)
-    y2_train_pred = model.predict(X2_train)
-    y2_train_MSE = MSE(y2_train_pred, y2_train)
 
-    y2_valid_pred = model.predict(X2_valid)
-    y2_valid_MSE = MSE(y2_valid_pred, y2_valid)
 
 
     
