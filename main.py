@@ -414,7 +414,7 @@ def train_test_split_kfold(dataset, split=0.8):
 
 
 class RidgeRegression():
-    def __init__(self, learning_rate, epochs, l2):
+    def __init__(self, learning_rate = 0.001, epochs = 200, l2 = 0):
         self.lr = learning_rate
         self.epochs = epochs
         self.l2 = l2
@@ -427,9 +427,9 @@ class RidgeRegression():
         self.y = y
 
         for i in range(self.epochs):
-            self.ridge_gradiant()
+            self.ridge_gradient()
 
-    def ridge_gradiant(self):
+    def ridge_gradient(self):
         y_pred = self.predict(self.X)
 
         error = y_pred - self.y
