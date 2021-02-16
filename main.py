@@ -1,10 +1,12 @@
 ###################################################################################################
 ############################################# MODULES #############################################
 ###################################################################################################
+from typing import IO
 import numpy as np
 import pandas as pd
 import csv
 import matplotlib.pyplot as plt
+import random 
 
 PLOT_1 = False
 PLOT_2 = False
@@ -321,16 +323,86 @@ def exo2():
     print("QUESTION 3")
     print("-----------------")
     modelFinal.fit_and_plot_valid(X2_train, y2_train)
-
-    plt.show()
-
+    
 
 #########################################################################################################
 ############################################ EXO 3 ######################################################
 #########################################################################################################
+def train_test_split_kfold(dataset, split = 0.8):
+    train = list()
+    train_size = 0.8 * len(data)
+    test = np.array(data)
+
+    while len(train) < train_size:
+        data_cp_len = len(test)
+        index = random.randrange(0, data_cp_len)
+        train.append(test[index])
+        test = np.delete(test, index, 0)
+
+    train1 = []
+    train2 = []
+    train3 = []
+    train4 = []
+    train5 = []
+    test1 = []
+    test2 = []
+    test3 = []
+    test4 = []
+    test5 = []
+
+    train_size = len(train)
+    test_size = len(test)
+
+    index = 0
+    while(index < train_size):
+        tab = index % 5
+        if(tab == 0):
+            train1.append(train[index])
+        elif(tab == 1):
+            train2.append(train[index])
+        elif(tab == 2):
+            train3.append(train[index])
+        elif(tab == 3):
+            train4.append(train[index])
+        else:
+            train5.append(train[index])
+        index+=1
+
+    index = 0
+    while(index < test_size):
+        tab = index % 5
+        if(tab == 0):
+            test1.append(test[index])
+        elif(tab == 1):
+            test2.append(test[index])
+        elif(tab == 2):
+            test3.append(test[index])
+        elif(tab == 3):
+            test4.append(test[index])
+        else:
+            test5.append(test[index])
+        index+=1
+
+    return train1, train2, train3, train4, train5, test1, test2, test3, test4, test5
+
+
 
 def exo3():
-    print("hey")
+    print("On peut utiliser la moyenne de l'échantillon de chaque colonne. Cela nous permet de pouvoir travailler correctement avec les données. Cependant cela implique que nous sous-estimons la variance de nos données.")
+    
+    # Train Test Split + 5 fold 
+    train1 = []
+    train2 = []
+    train3 = []
+    train4 = []
+    train5 = []
+    test1 = []
+    test2 = []
+    test3 = []
+    test4 = []
+    test5 = []
+
+    train1, train2, train3, train4, train5, test1, test2, test3, test4, test5 = train_test_split_kfold(data)
 
 
 if __name__ == '__main__':
