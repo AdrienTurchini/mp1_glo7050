@@ -432,9 +432,9 @@ class RidgeRegression():
     def ridge_gradiant(self):
         y_pred = self.predict(self.X)
 
-        error = y_pred - y
+        error = y_pred - self.y
 
-        d_w = ((self.X.T @ error) + self.l2*self.W)/self.m
+        d_w = ((self.X.T @ error) + self.l2*self.w)/self.m
         d_b = np.sum(error)/self.m
 
         self.w = self.w - self.lr * d_w
