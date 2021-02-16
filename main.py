@@ -410,7 +410,10 @@ def train_test_split_kfold(dataset, split=0.8):
             test5.append(test[index])
         index += 1
 
-    return train1, train2, train3, train4, train5, test1, test2, test3, test4, test5
+    train = [train1, train2, train3, train4, train5]
+    test = [test1, test2, test3, test4, test5]
+
+    return train, test
 
 
 class RidgeRegression():
@@ -448,19 +451,22 @@ def exo3():
     print("On peut utiliser la moyenne de l'échantillon de chaque colonne. Cela nous permet de pouvoir travailler correctement avec les données. Cependant cela implique que nous sous-estimons la variance de nos données.")
 
     # Train Test Split + 5 fold
-    train1 = []
-    train2 = []
-    train3 = []
-    train4 = []
-    train5 = []
-    test1 = []
-    test2 = []
-    test3 = []
-    test4 = []
-    test5 = []
+    train, test = train_test_split_kfold(data)
 
-    train1, train2, train3, train4, train5, test1, test2, test3, test4, test5 = train_test_split_kfold(
-        data)
+    
+
+
+    model = LinearReg(epochs=50, learning_rate=1e-6,
+                      X_valid=X2_valid, y_valid=y2_valid)
+    model.fit_and_MSE_valid(X2_train, y2_train)
+    y2_train_pred = model.predict(X2_train)
+    y2_train_MSE = MSE(y2_train_pred, y2_train)
+
+    y2_valid_pred = model.predict(X2_valid)
+    y2_valid_MSE = MSE(y2_valid_pred, y2_valid)
+
+
+    
 
 
 if __name__ == '__main__':
