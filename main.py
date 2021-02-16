@@ -461,7 +461,7 @@ def exo3():
     print("On peut utiliser la moyenne de l'échantillon de chaque colonne. Cela nous permet de pouvoir travailler correctement avec les données. Cependant cela implique que nous sous-estimons la variance de nos données.")
 
     # Train Test Split + 5 fold
-    print(data.head())
+
     train, test = train_test_split_kfold(data)
     mse_kfold = []
 
