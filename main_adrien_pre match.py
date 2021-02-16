@@ -61,7 +61,6 @@ data = pd.read_csv('Datasets/communities.data',
 
 print(data.head())
 data = data.loc[:, data.columns != 'communityname']
-data = data.loc[:, data.columns != "community"]
 data = data.astype('float')
 print(data.head())
 missing_features = data.columns[data.isnull().any()]
@@ -418,7 +417,7 @@ def train_test_split_kfold(dataset, split=0.8):
 
 
 class RidgeRegression():
-    def __init__(self, learning_rate = 0.001, epochs = 100, l2 = 0):
+    def __init__(self, learning_rate = 0.001, epochs = 200, l2 = 0):
         self.lr = learning_rate
         self.epochs = epochs
         self.l2 = l2
@@ -438,14 +437,14 @@ class RidgeRegression():
 
         error = y_pred - self.y
 
-        d_w = ((self.X.T @ error) + self.l2*self.w)/self.m
+        d_w = (np.dot(self.X.T, error) + self.l2*self.w)/self.m
         d_b = np.sum(error)/self.m
 
         self.w = self.w - self.lr * d_w
         self.b = self.b - self.lr * d_b
 
     def predict(self, X):
-        return X @ self.w + self.b
+        return np.dot(X, self.w) + self.b
 
     def MSE(self):
         return np.square(self.y_pred - self.y).mean() 
@@ -456,29 +455,35 @@ class RidgeRegression():
         return self.MSE()
 
 
-
 def exo3():
-    print("On peut utiliser la moyenne de l'échantillon de chaque colonne. Cela nous permet de pouvoir travailler correctement avec les données. Cependant cela implique que nous sous-estimons la variance de nos données.")
+    #print("On peut utiliser la moyenne de l'échantillon de chaque colonne. Cela nous permet de pouvoir travailler correctement avec les données. Cependant cela implique que nous sous-estimons la variance de nos données.")
 
     # Train Test Split + 5 fold
-    print(data.head())
     train, test = train_test_split_kfold(data)
+    model = RidgeRegression()
     mse_kfold = []
+    for i in range(len(train)):
+        X_train, y_train = train[i][:, :126], train[i][:, 126]
+        model.fit(X_train, y_train)
+        #y_train_pred = model.predict(X_train)
+        fold_mse = model.score(X_train, y_train)
+        print(fold_mse)
+        mse_kfold.append(fold_mse)
+
+    #model_mse = mse_kfold.mean()
+   
 
     
 
-    for i in range(1):
-        X_train, y_train = train[i][:, :125], train[i][:, 125]
-        model = RidgeRegression()
-        model.fit(X_train, y_train)
-        mse = model.score(X_train, y_train)
-        mse_kfold.append(mse)
 
-    mse_kfold = np.array(mse_kfold)
-    mse = mse_kfold.mean()
 
-    # MSE 
-    print(mse)
+    
+
+
+
+
+
+    
 
 
 if __name__ == '__main__':
