@@ -16,41 +16,41 @@ PLOT_2 = False
 ###################################################################################################
 with open('Datasets/Dataset_1_test.csv') as csvfile:
     data = np.array(list(csv.reader(csvfile)))
-    data = data[:, :2].astype(np.float)
+    data = data[:, :2].astype(np.float64)
     X1_test = data[:, 0]
     y1_test = data[:, 1]
 
 with open('Datasets/Dataset_1_train.csv') as csvfile:
     data = np.array(list(csv.reader(csvfile)))
-    data = data[:, :2].astype(np.float)
+    data = data[:, :2].astype(np.float64)
     X1_train = data[:, 0]
     X1_train / np.linalg.norm(X1_train)
     y1_train = data[:, 1]
 
 with open('Datasets/Dataset_1_valid.csv') as csvfile:
     data = np.array(list(csv.reader(csvfile)))
-    data = data[:, :2].astype(np.float)
+    data = data[:, :2].astype(np.float64)
     X1_valid = data[:, 0]
     X1_valid / np.linalg.norm(X1_valid)
     y1_valid = data[:, 1]
 
 with open('Datasets/Dataset_2_test.csv') as csvfile:
     data = np.array(list(csv.reader(csvfile)))
-    data = data[:, :2].astype(np.float)
+    data = data[:, :2].astype(np.float64)
     X2_test = data[:, 0]
     X2_test / np.linalg.norm(X2_test)
     y2_test = data[:, 1]
 
 with open('Datasets/Dataset_2_train.csv') as csvfile:
     data = np.array(list(csv.reader(csvfile)))
-    data = data[:, :2].astype(np.float)
+    data = data[:, :2].astype(np.float64)
     X2_train = data[:, 0]
     X2_train / np.linalg.norm(X1_train)
     y2_train = data[:, 1]
 
 with open('Datasets/Dataset_2_valid.csv') as csvfile:
     data = np.array(list(csv.reader(csvfile)))
-    data = data[:, :2].astype(np.float)
+    data = data[:, :2].astype(np.float64)
     X2_valid = data[:, 0]
     X2_valid / np.linalg.norm(X1_valid)
     y2_valid = data[:, 1]
@@ -59,21 +59,22 @@ names = pd.read_csv('Datasets/attributes.csv', delim_whitespace=True)
 data = pd.read_csv('Datasets/communities.data',
                    names=names['names']).replace('?', np.NaN)
 
-print(data.head())
+#print(data.head())
 data = data.loc[:, data.columns != 'communityname']
-data = data.loc[:, data.columns != "community"]
+#data = data.loc[:, data.columns != "community"]
 data = data.astype('float')
-print(data.head())
+#print(data.head())
 missing_features = data.columns[data.isnull().any()]
-print(missing_features)
-print(data[missing_features].mean())
+#print(missing_features)
+#print(data[missing_features].mean())
 for col in missing_features:
     data[col].fillna(value=data[col].mean(), inplace=True)
-print(data[missing_features].mean())
-print(data.head())
-
-print(data.shape)
-print(data.head())
+#print(data[missing_features].mean())
+#print(data.head())
+#print(data.shape)
+#print(data.head())
+#data = data/np.linalg.norm(data)
+#print(data.head())
 
 #########################################################################################################
 ############################################ FUNCTIONS EXO 1 ############################################
@@ -247,9 +248,9 @@ def exo1():
     y1_valid_pred_L2s, y1_train_pred_L2s = [], []
     MSE_valids, MSE_trains = [], []
     N = 100
-    L2_factors = [i/N for i in range(N)]
+    L2_factors = [i/N for i in range(N+1)]
 
-    for i in range(N):
+    for i in range(N+1):
         L2_factor = i/N
         w_L2 = fit_L2(X1_train, y1_train, L2_factor)
         y1_valid_pred_L2 = predict(X1_valid, w_L2)
@@ -357,6 +358,7 @@ def exo2():
 ############################################ EXO 3 ######################################################
 #########################################################################################################
 def train_test_split_kfold(dataset, split=0.8):
+    random.seed(1)
     train = list()
     train_size = 0.8 * len(data)
     test = np.array(data)
@@ -455,33 +457,104 @@ class RidgeRegression():
         self.y = y
         return self.MSE()
 
+def normalize(data):
+    for i in range(data.shape[1]):
+        mymin = min(data[:,i])
+        mymax = max(data[:,i])
+        data[:,i] = (data[:,i] - mymin)/(mymax - mymin)
+    return data
+
 
 
 def exo3():
-    print("On peut utiliser la moyenne de l'échantillon de chaque colonne. Cela nous permet de pouvoir travailler correctement avec les données. Cependant cela implique que nous sous-estimons la variance de nos données.")
-
-    # Train Test Split + 5 fold
-
+    #On peut utiliser la moyenne de l'échantillon de chaque colonne. Cela nous permet de pouvoir travailler correctement avec les données. Cependant cela implique que nous sous-estimons la variance de nos données.
     train, test = train_test_split_kfold(data)
-    mse_kfold = []
+
+
+    #Q2
+    # Train Test Split + 5 fold
+    
+    
+    mse_kfold_q1 = []
+    for i in range(len(train)):
+        X_train, y_train = train[i][:, :125], train[i][:, 125]
+        X_test, y_test = test[i][:, :125], test[i][:, 125]
+        X_train = normalize(X_train)
+        X_test = normalize(X_test)
+        model = RidgeRegression(learning_rate=0.05, epochs = 20)
+        model.fit(X_train, y_train)
+        mse = model.score(X_test, y_test)
+        mse_kfold_q1.append(mse)
+
+        '''X = np.arange(0,320,1)
+        y_pred = model.predict(X_train)
+        print(X.shape)
+        plt.scatter(X, y_train)
+        plt.scatter(X, y_pred)
+        plt.show()'''
+
+    mse_kfold_q1 = np.array(mse_kfold_q1)
+    mse_mean_q1 = mse_kfold_q1.mean()
+    print(mse_mean_q1)
+
+    #Q3
+    mse_l2 = []
+    N=100
+    #L2_factors = [i/N for i in range(N+1)]
+    
+    L2_factors = np.arange(0,200, 1)
+    for l2_factor in L2_factors:
+        mse_kfold_q2 = []
+        model = RidgeRegression(learning_rate=0.05, epochs = 100, l2=l2_factor)
+        for i in range(len(train)):
+            X_train, y_train = train[i][:, :125], train[i][:, 125]
+            X_test, y_test = test[i][:, :125], test[i][:, 125]
+            X_train = normalize(X_train)
+            X_test = normalize(X_test)
+            model.fit(X_train, y_train)
+            mse = model.score(X_test, y_test)
+            mse_kfold_q2.append(mse)
+        mse_kfold_q2 = np.array(mse_kfold_q2)
+        mse_kfold_mean = mse_kfold_q2.mean()
+        mse_l2.append(mse_kfold_mean)
+    
+    plt.plot(L2_factors, mse_l2)
+    plt.show()
+
+    '''from sklearn.linear_model import LinearRegression, Ridge
+    from sklearn.metrics import r2_score, mean_squared_error
+
+    #for i in range(len(train)):
+    X_train, y_train = train[0][:, :125], train[0][:, 125]
+    X_test, y_test = test[0][:, :125], test[0][:, 125]
+    X_train = normalize(X_train)
+    X_test = normalize(X_test)
+    
+    msee = []
+
+    for alpha in np.arange(0, 200, 1):
+        # training
+        ridge_reg = Ridge(alpha=alpha)
+        ridge_reg.fit(X_train, y_train)
+        #var_name = 'estimate' + str(alpha)
+        #ridge_df[var_name] = ridge_reg.coef_
+        # prediction
+        y_train_pred = ridge_reg.predict(X_train)
+        y_test_pred = ridge_reg.predict(X_test)
+        # MSE of Ridge and OLS
+        mseeee = MSE(y_test_pred, y_test)
+        
+        msee.append(mseeee)
+
+    intervals = np.arange(0,200, 1)
+    plt.plot(intervals, msee)
+    plt.show()'''
 
     
-
-    for i in range(1):
-        X_train, y_train = train[i][:, :125], train[i][:, 125]
-        model = RidgeRegression()
-        model.fit(X_train, y_train)
-        mse = model.score(X_train, y_train)
-        mse_kfold.append(mse)
-
-    mse_kfold = np.array(mse_kfold)
-    mse = mse_kfold.mean()
-
-    # MSE 
-    print(mse)
+    
 
 
 if __name__ == '__main__':
-    # exo1()
+    #exo1()
     # exo2()
     exo3()
