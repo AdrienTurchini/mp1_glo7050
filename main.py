@@ -234,6 +234,8 @@ class LinearReg:
 ###################################################################################################
 ############################################## CODE ###############################################
 ###################################################################################################
+
+
 def exo1():
     w = fit(X1_train, y1_train)
     y1_valid_pred = predict(X1_valid, w)
@@ -336,7 +338,7 @@ def exo2():
 
     print("\nLe pas qui nous donne la MSE la plus faible est 0.95, nous le garderons donc par la suite.")
     print("-----")
-    modelFinal = LinearReg(epochs=1, learning_rate=0.95,
+    modelFinal = LinearReg(epochs=50, learning_rate=0.95,
                            X_valid=X2_valid, y_valid=y2_valid)
     modelFinal.fit(X2_train, y2_train)
 
@@ -471,7 +473,6 @@ def exo3():
 
     #Q2
     # Train Test Split + 5 fold
-    
     
     mse_kfold_q1 = []
     for i in range(len(train)):
